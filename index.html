@@ -1,0 +1,1903 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Catiflytek 跳转小助手 | sym & yyb & Floruit</title>
+    <style>
+        /* ===== 全局重置 & 变量 (完全保持原样) ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --space-0: 0px;
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 36px;
+            --radius-full: 999px;
+
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.5rem;
+
+            --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+            --user-accent-h: 225;
+            --user-accent-s: 100%;
+            --user-accent-l: 60%;
+            --user-blur: 20px;
+            --user-card-scale: 1;
+            --user-spacing: 1;
+
+            --accent-hsl: hsl(var(--user-accent-h), var(--user-accent-s), var(--user-accent-l));
+            --accent-deep-hsl: hsl(var(--user-accent-h), var(--user-accent-s), calc(var(--user-accent-l) - 12%));
+            --accent-soft-hsl: hsl(var(--user-accent-h), calc(var(--user-accent-s) - 20%), calc(var(--user-accent-l) + 22%));
+            --accent-glow-hsl: hsla(var(--user-accent-h), var(--user-accent-s), var(--user-accent-l), 0.25);
+
+            --bg-base: #f4f7fc;
+            --bg-surface: rgba(255, 255, 255, 0.72);
+            --bg-surface-solid: #ffffff;
+            --bg-elevated: rgba(255, 255, 255, 0.9);
+            --border-light: rgba(0, 0, 0, 0.06);
+            --border-medium: rgba(0, 0, 0, 0.1);
+            --text-primary: #1c1e2b;
+            --text-secondary: #5b5f70;
+            --text-tertiary: #8e93a6;
+            --accent-soft: var(--accent-soft-hsl);
+            --accent: var(--accent-hsl);
+            --accent-deep: var(--accent-deep-hsl);
+            --accent-glow: var(--accent-glow-hsl);
+            --green: #10b981;
+            --orange: #f59e0b;
+            --gray: #94a3b8;
+            --shadow-color: rgba(0, 0, 0, 0.04);
+            --backdrop-blur: var(--user-blur);
+            --card-padding: calc(var(--space-5) * var(--user-spacing));
+            --grid-gap: calc(var(--space-5) * var(--user-spacing));
+        }
+
+        [data-theme="dark"] {
+            --bg-base: #0b0f17;
+            --bg-surface: rgba(18, 25, 40, 0.7);
+            --bg-surface-solid: #111a28;
+            --bg-elevated: rgba(25, 35, 55, 0.85);
+            --border-light: rgba(255, 255, 255, 0.04);
+            --border-medium: rgba(255, 255, 255, 0.08);
+            --text-primary: #edf2f9;
+            --text-secondary: #a6b3cf;
+            --text-tertiary: #6f7c9a;
+            --accent-soft: hsl(var(--user-accent-h), 35%, 28%);
+            --accent: hsl(var(--user-accent-h), 80%, 65%);
+            --accent-deep: hsl(var(--user-accent-h), 75%, 52%);
+            --accent-glow: hsla(var(--user-accent-h), 80%, 65%, 0.3);
+            --green: #34d399;
+            --orange: #fbbf24;
+            --gray: #6b7b95;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* ===== 基础样式 (保持原样) ===== */
+        body {
+            background-color: var(--bg-base);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: var(--space-5);
+            transition: background-color 0.3s ease, color 0.2s ease;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url('http://fuckiflytek.jkun.cf/picture.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: -2;
+            will-change: transform;
+        }
+
+        .glass-panel {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--bg-surface);
+            backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8) var(--space-6);
+            box-shadow: 0 40px 80px -20px var(--shadow-color);
+            will-change: transform;
+        }
+
+        .aura-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .logo-badge h1 {
+            font-size: var(--font-4xl);
+            font-weight: 700;
+            background: linear-gradient(140deg, var(--accent), var(--accent-deep));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+        .logo-badge h1:active {
+            transform: scale(0.96);
+        }
+
+        .beta-tag {
+            background: var(--accent-soft);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-sm);
+            font-weight: 600;
+            color: var(--accent-deep);
+        }
+
+        .stats-minimal {
+            display: flex;
+            gap: var(--space-6);
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: var(--space-4) 0;
+        }
+
+        .stat-block {
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-block .number {
+            font-size: var(--font-3xl);
+            font-weight: 650;
+            color: var(--accent);
+        }
+
+        .search-bar {
+            margin: var(--space-4) 0 var(--space-6);
+            display: flex;
+            justify-content: center;
+        }
+        .search-input-wrapper {
+            width: 100%;
+            max-width: 520px;
+            background: var(--bg-elevated);
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-4);
+        }
+        .search-input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: var(--space-3) 0;
+            font-size: var(--font-sm);
+            color: var(--text-primary);
+            outline: none;
+        }
+        .search-clear {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-tertiary);
+        }
+
+        .filter-cortex {
+            margin: var(--space-2) 0 var(--space-8);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-2);
+            background: var(--bg-elevated);
+            border-radius: var(--radius-full);
+        }
+
+        .filter-tag {
+            padding: var(--space-2) var(--space-5);
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-full);
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .filter-tag.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 8px 18px -6px var(--accent-glow);
+        }
+
+        .filter-tag.suibian {
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+            font-weight: 650;
+            border: 1px solid var(--accent);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: var(--grid-gap);
+            margin: var(--space-8) 0;
+        }
+
+        .neo-card {
+            background: var(--bg-elevated);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--card-padding);
+            transition: transform 0.25s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            content-visibility: auto;
+            contain-intrinsic-size: auto 220px;
+            will-change: transform;
+            contain: layout style paint;
+        }
+
+        .neo-card:hover {
+            transform: translateY(-4px) scale(var(--user-card-scale));
+            border-color: var(--accent-soft);
+            box-shadow: 0 25px 35px -16px var(--accent-glow);
+        }
+
+        .neo-card.random-highlight {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            animation: rainbow-glow 1.2s ease-in-out;
+        }
+
+        @keyframes rainbow-glow {
+            0% { border-color: #f44336; box-shadow: 0 0 20px #f44336; }
+            25% { border-color: #ff9800; box-shadow: 0 0 20px #ff9800; }
+            50% { border-color: #4caf50; box-shadow: 0 0 20px #4caf50; }
+            75% { border-color: #2196f3; box-shadow: 0 0 20px #2196f3; }
+            100% { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-3);
+        }
+
+        .card-cat {
+            background: var(--accent-soft);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-xs);
+            font-weight: 600;
+            color: var(--accent-deep);
+        }
+
+        .card-status {
+            font-size: var(--font-xs);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+        }
+        .card-status.available {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--green);
+        }
+        .card-status.partial {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--orange);
+        }
+        .card-status.unavailable {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--gray);
+        }
+
+        .card-title {
+            font-weight: 650;
+            font-size: var(--font-lg);
+            margin: var(--space-2) 0;
+            color: var(--text-primary);
+        }
+
+        .card-desc {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+        }
+
+        .intent-block {
+            background: var(--bg-surface-solid);
+            border-radius: var(--radius-md);
+            padding: var(--space-3);
+            font-family: monospace;
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-medium);
+            margin: var(--space-3) 0;
+            word-break: break-all;
+        }
+
+        .action-group {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: auto;
+        }
+
+        .btn-minimal {
+            flex: 1;
+            padding: var(--space-3);
+            border-radius: var(--radius-full);
+            border: none;
+            font-weight: 550;
+            font-size: var(--font-sm);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-minimal.primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+        .btn-minimal.primary:hover {
+            background: var(--accent-deep);
+        }
+
+        .btn-minimal.delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .custom-maker-card {
+            background: var(--bg-elevated);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--card-padding);
+            margin: var(--space-6) 0;
+        }
+
+        .custom-maker-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+            align-items: flex-end;
+        }
+
+        .input-group {
+            flex: 2 1 260px;
+        }
+        .input-group label {
+            display: block;
+            font-size: var(--font-xs);
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            background: var(--bg-surface-solid);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            padding: var(--space-3);
+            font-size: var(--font-sm);
+            color: var(--text-primary);
+        }
+
+        .btn-maker {
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius-full);
+            padding: var(--space-3) var(--space-6);
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+        }
+
+        .meta-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+            margin-top: var(--space-8);
+            padding-top: var(--space-5);
+            border-top: 1px solid var(--border-light);
+            color: var(--text-tertiary);
+            font-size: var(--font-sm);
+        }
+
+        .reset-welcome-btn {
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+            border: 1px solid var(--accent);
+            padding: var(--space-1) var(--space-4);
+            border-radius: var(--radius-full);
+            font-size: var(--font-xs);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .reset-welcome-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .bottom-dock {
+            margin-top: var(--space-8);
+            border-top: 1px solid var(--border-light);
+            padding-top: var(--space-6);
+        }
+
+        .help-card {
+            background: var(--bg-elevated);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin-bottom: var(--space-5);
+        }
+
+        .help-header {
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .help-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+
+        .help-content.show {
+            max-height: 300px;
+            opacity: 1;
+            margin-top: var(--space-4);
+        }
+
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .help-item {
+            background: var(--bg-surface-solid);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+        }
+
+        .sponsor-card {
+            background: var(--bg-elevated);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sponsor-qr {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            background: var(--bg-surface-solid);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+        }
+
+        .sponsor-qr img {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+        }
+
+        .qr-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--bg-elevated);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .qr-popup.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .orbit-group {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            display: flex;
+            gap: 16px;
+            z-index: 99;
+        }
+        .theme-orbit,
+        .settings-orbit {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.15s;
+        }
+        .theme-orbit:active,
+        .settings-orbit:active {
+            transform: scale(0.92);
+        }
+
+        .settings-drawer {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            width: 280px;
+            background: var(--bg-elevated);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            z-index: 150;
+            opacity: 0;
+            transform: translateY(12px) scale(0.96);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            box-shadow: 0 20px 60px -12px var(--shadow-color);
+        }
+        .settings-drawer.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .settings-drawer h3 {
+            margin-bottom: var(--space-4);
+            font-size: var(--font-lg);
+            color: var(--text-primary);
+        }
+        .settings-drawer label {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            margin-top: var(--space-3);
+        }
+        .settings-drawer input[type="range"] {
+            width: 100%;
+            margin-top: 4px;
+            accent-color: var(--accent);
+            background: transparent;
+            cursor: pointer;
+        }
+        .settings-drawer .reset-btn {
+            margin-top: var(--space-4);
+            width: 100%;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-medium);
+            background: var(--bg-surface-solid);
+            color: var(--text-primary);
+            font-size: var(--font-sm);
+            font-weight: 550;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .settings-drawer .reset-btn:hover {
+            background: var(--accent-soft);
+        }
+
+        .toast-vapor {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-elevated);
+            backdrop-filter: blur(30px);
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-full);
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+        }
+        .toast-vapor.show {
+            opacity: 1;
+        }
+
+        .welcome-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            pointer-events: auto;
+        }
+        .welcome-modal.hide {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal-card {
+            max-width: 420px;
+            background: var(--bg-elevated);
+            backdrop-filter: blur(32px);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8) var(--space-6);
+            text-align: center;
+            pointer-events: auto;
+        }
+        .modal-card button {
+            margin-top: var(--space-6);
+            background: var(--accent);
+            border: none;
+            padding: var(--space-3) var(--space-8);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            font-size: var(--font-lg);
+            transition: background 0.2s, transform 0.15s;
+            pointer-events: auto !important;
+            touch-action: manipulation;
+        }
+        .modal-card button:hover {
+            background: var(--accent-deep);
+        }
+        .modal-card button:active {
+            transform: scale(0.95);
+        }
+
+        .maker-credit {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 100;
+            background: var(--bg-elevated);
+            backdrop-filter: blur(20px);
+            padding: 12px 28px;
+            border-radius: 60px;
+            border: 2px solid var(--accent);
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+        }
+        .maker-credit strong {
+            background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* ===== 彩蛋：飘落猫咪 ===== */
+        .cat-rain {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 3rem;
+            animation: catFall 2.5s ease-in forwards;
+        }
+        @keyframes catFall {
+            0% { opacity: 1; transform: translateY(-20px) rotate(0deg) scale(0.8); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(1.5); }
+        }
+
+        @media (max-width: 700px) {
+            .glass-panel {
+                padding: var(--space-5) var(--space-4);
+            }
+            .filter-tag {
+                padding: var(--space-1) var(--space-3);
+                font-size: var(--font-xs);
+            }
+            .maker-credit {
+                padding: 8px 18px;
+                font-size: 0.9rem;
+                left: 16px;
+                bottom: 16px;
+            }
+            .settings-drawer {
+                right: 16px;
+                width: 260px;
+                bottom: 90px;
+            }
+            .orbit-group {
+                right: 16px;
+                bottom: 20px;
+                gap: 12px;
+            }
+            .theme-orbit,
+            .settings-orbit {
+                width: 48px;
+                height: 48px;
+                font-size: 1.4rem;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-4);
+            }
+            .toast-vapor {
+                font-size: var(--font-sm);
+                padding: var(--space-2) var(--space-4);
+                bottom: 80px;
+                white-space: normal;
+            }
+            .modal-card {
+                max-width: 90%;
+                padding: var(--space-6) var(--space-4);
+            }
+            .modal-card button {
+                padding: var(--space-2) var(--space-6);
+                font-size: var(--font-base);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-minimal .stat-block {
+                min-width: 70px;
+            }
+            .stat-block .number {
+                font-size: var(--font-2xl);
+            }
+            .maker-credit {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+                left: 12px;
+                bottom: 12px;
+            }
+            .settings-drawer {
+                width: 220px;
+                right: 12px;
+                bottom: 80px;
+                padding: var(--space-4);
+            }
+            .orbit-group {
+                right: 12px;
+                bottom: 16px;
+                gap: 10px;
+            }
+            .theme-orbit,
+            .settings-orbit {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 欢迎弹窗 ===== -->
+    <div id="welcomeModal" class="welcome-modal">
+        <div class="modal-card">
+            <div class="cat-icon" style="font-size: 3rem;">🐱✨</div>
+            <h2 style="margin: var(--space-3) 0;">Catiflytek 跳转小助手</h2>
+            <p>本程序由 <strong>sym</strong>，<strong>yyb</strong>，<strong>Floruit</strong> 开发测试<br>关于近期某人视频号上的盗取方法行为做出说明：不要相信非官方发布的视频，如果你来自B站世遇の梦或者我们官方的人，请不必继续看，点击"开始使用"继续，目前的盗取方法的人：kipfel忠诚者，官方QQ交流群：1060411657<br>感谢您的支持与信任！喵~</p>
+            <button id="closeWelcomeBtn" onclick="closeWelcomeModal()">✨ 开始使用 ✨</button>
+        </div>
+    </div>
+
+    <!-- ===== 主面板 ===== -->
+    <div class="glass-panel">
+        <div class="aura-header">
+            <div class="logo-badge">
+                <h1 id="mainTitle">Catiflytek 跳转小助手喵~ V4.0</h1>
+                <span class="beta-tag">2026/6/22 更新！</span>
+            </div>
+            <div class="stats-minimal">
+                <div class="stat-block"><div class="number" id="total-count">0</div><div class="label">总方法</div></div>
+                <div class="stat-block"><div class="number" id="custom-count">0</div><div class="label">自定义</div></div>
+                <div class="stat-block"><div class="number" id="attempt-count">0</div><div class="label">尝试</div></div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索卡片...">
+                <button class="search-clear" id="clearSearchBtn" style="display: none;">✖</button>
+            </div>
+        </div>
+
+        <div class="filter-cortex" id="filterContainer">
+            <button class="filter-tag active" data-filter="all">全部</button>
+            <button class="filter-tag" data-filter="developer">开发者</button>
+            <button class="filter-tag" data-filter="about">关于</button>
+            <button class="filter-tag" data-filter="accessibility">无障碍</button>
+            <button class="filter-tag" data-filter="security">安全</button>
+            <button class="filter-tag" data-filter="vpn">VPN</button>
+            <button class="filter-tag" data-filter="apn">APN</button>
+            <button class="filter-tag" data-filter="bluetooth">蓝牙</button>
+            <button class="filter-tag" data-filter="wifi">WiFi</button>
+            <button class="filter-tag" data-filter="battery">电池</button>
+            <button class="filter-tag" data-filter="app">应用</button>
+            <button class="filter-tag" data-filter="display">显示</button>
+            <button class="filter-tag" data-filter="sound">声音</button>
+            <button class="filter-tag" data-filter="storage">存储</button>
+            <button class="filter-tag" data-filter="location">定位</button>
+            <button class="filter-tag" data-filter="notification">通知</button>
+            <button class="filter-tag" data-filter="hotspot">热点</button>
+            <button class="filter-tag" data-filter="account">账户</button>
+            <button class="filter-tag" data-filter="language">语言</button>
+            <button class="filter-tag" data-filter="system">系统</button>
+            <button class="filter-tag" data-filter="custom">自定义</button>
+            <button class="filter-tag suibian" id="randomBtn">✨ 随机选一个</button>
+        </div>
+
+        <div id="cards-container" class="card-grid"></div>
+
+        <div class="custom-maker-card">
+            <div class="custom-maker-header" style="margin-bottom: var(--space-4);">
+                <span class="custom-badge" style="background: var(--accent); padding: 4px 16px; border-radius: var(--radius-full);">➕ 自定义Intent</span>
+            </div>
+            <div class="custom-maker-row">
+                <div class="input-group"><label>📦 包名</label><input type="text" id="customPkg" value="com.android.settings"></div>
+                <div class="input-group"><label>🧩 类名</label><input type="text" id="customCls" value=".Settings$DevelopmentSettingsActivity"></div>
+                <div class="input-group"><label>📝 标题</label><textarea id="customDesc" rows="1">自定义: 开发者选项</textarea></div>
+                <button class="btn-maker" id="addCustomBtn">✨ 生成并保存</button>
+            </div>
+            <div style="font-size: var(--font-xs); margin-top: var(--space-3);">⚡ intent:#Intent;component=<span id="previewIntent">com.android.settings/.Settings$DevelopmentSettingsActivity</span>;end</div>
+        </div>
+
+        <div class="meta-footer">
+            <div><span id="success-count">0</span> 成功 · <span id="total-attempts">0</span> 尝试</div>
+            <div>sym & yyb & Floruit</div>
+            <div>
+                © 2026 Catiflytek
+                <!-- 重置欢迎弹窗按钮（点击后立即显示弹窗） -->
+                <button class="reset-welcome-btn" onclick="resetWelcomeModal()">🔄 显示欢迎弹窗</button>
+            </div>
+        </div>
+
+        <div class="bottom-dock">
+            <div class="help-card">
+                <div class="help-header" id="helpHeader">
+                    <h3>📚 帮助中心</h3>
+                    <div class="help-toggle-icon" id="helpToggle" style="font-size: 1.5rem;">➕</div>
+                </div>
+                <div class="help-content" id="helpContent">
+                    <div class="help-grid">
+                        <div class="help-item"><strong>❓ 为什么无法跳转？</strong><br>可能被系统屏蔽或浏览器不支持</div>
+                        <div class="help-item"><strong>📦 自定义格式</strong><br>包名 + 类名，如 com.android.settings/.Settings</div>
+                        <div class="help-item"><strong>💾 保存说明</strong><br>保存在浏览器缓存中，清除会丢失</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sponsor-card">
+                <div><span style="font-size: 1.5rem;">🍖</span> 感谢赞助喵~</div>
+                <div class="sponsor-qr" id="showQrBtn"><img src="http://fuckiflytek.jkun.cf/donation_qr.png" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%23ddd%22 width=%2232%22 height=%2232%22/%3E%3Ctext x=%225%22 y=%2222%22 font-size=%2216%22 fill=%22%23999%22%3EQR%3C/text%3E%3C/svg%3E'"><span>扫码投喂</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="maker-credit">
+        <span>🧸</span> 制作 by <strong>sym</strong> & <strong>yyb</strong> & <strong>Floruit</strong>
+    </div>
+
+    <!-- ===== 二维码弹窗 ===== -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="qr-popup" id="qrPopup"><img src="http://fuckiflytek.jkun.cf/donation_qr.png" style="max-width: 180px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22%3E%3Crect fill=%22%23eee%22 width=%22180%22 height=%22180%22/%3E%3Ctext x=%2230%22 y=%2290%22 font-size=%2236%22 fill=%22%23999%22%3EQR%3C/text%3E%3C/svg%3E'"><p>感谢支持 ✨</p></div>
+
+    <!-- ===== 右下角控件 ===== -->
+    <div class="orbit-group">
+        <div class="settings-orbit" id="settings-btn">⚙️</div>
+        <div class="theme-orbit" id="theme-btn">🌙</div>
+    </div>
+
+    <!-- ===== 设置抽屉 ===== -->
+    <div class="settings-drawer" id="settings-drawer">
+        <h3>个性化</h3>
+        <div>
+            <label>主色调 <span id="hueValue">225°</span></label>
+            <input type="range" id="hueSlider" min="0" max="360" value="225">
+        </div>
+        <div>
+            <label>卡片密度 <span id="scaleValue">1.0x</span></label>
+            <input type="range" id="scaleSlider" min="0.85" max="1.15" value="1.0" step="0.01">
+        </div>
+        <button class="reset-btn" id="resetSettings">重置默认</button>
+    </div>
+
+    <!-- ===== Toast ===== -->
+    <div class="toast-vapor" id="toast"></div>
+
+    <script>
+        // ================================================================
+        //  1. 全局函数：关闭欢迎弹窗（不再写入 localStorage）
+        // ================================================================
+        function closeWelcomeModal() {
+            var modal = document.getElementById('welcomeModal');
+            if (modal) modal.classList.add('hide');
+            // 注释掉写入 localStorage，这样刷新后弹窗会再次显示
+            // try { localStorage.setItem('welcomeClosed', 'true'); } catch (_) {}
+        }
+
+        // 重置欢迎弹窗：直接显示弹窗（不依赖任何存储）
+        function resetWelcomeModal() {
+            var modal = document.getElementById('welcomeModal');
+            if (modal) modal.classList.remove('hide');
+            showToast('🔄 欢迎弹窗已重新显示');
+        }
+        window.resetWelcomeModal = resetWelcomeModal;
+
+        // ================================================================
+        //  2. 趣味彩蛋模块（保留不变）
+        // ================================================================
+        (function() {
+            var audioCtx = null;
+            function playMeow() {
+                try {
+                    if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                    var osc = audioCtx.createOscillator();
+                    var gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.08);
+                    osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                    osc.start(audioCtx.currentTime);
+                    osc.stop(audioCtx.currentTime + 0.2);
+                } catch (_) {}
+            }
+
+            function catRain() {
+                var emojis = ['🐱', '😺', '😸', '😻', '🙀', '🐈', '🐾'];
+                for (var i = 0; i < 12; i++) {
+                    (function() {
+                        var el = document.createElement('div');
+                        el.className = 'cat-rain';
+                        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        el.style.left = (Math.random() * 90 + 5) + '%';
+                        el.style.fontSize = (2 + Math.random() * 3) + 'rem';
+                        el.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+                        el.style.animationDelay = (Math.random() * 0.6) + 's';
+                        document.body.appendChild(el);
+                        setTimeout(function() { el.remove(); }, 4000);
+                    })();
+                }
+                playMeow();
+            }
+
+            var titleClickCount = 0;
+            var titleTimer = null;
+            var titleEl = document.getElementById('mainTitle');
+            if (titleEl) {
+                titleEl.addEventListener('click', function() {
+                    titleClickCount++;
+                    if (titleTimer) clearTimeout(titleTimer);
+                    titleTimer = setTimeout(function() { titleClickCount = 0; }, 1000);
+                    if (titleClickCount >= 5) {
+                        titleClickCount = 0;
+                        catRain();
+                        showToast('🎉 喵星人降临！');
+                    }
+                });
+            }
+
+            var funnyMessages = [
+                '🚀 喵呜~ 起飞！', '🐱 跳转中，请稍候~', '✨ 魔法传送启动！',
+                '🍣 鱼干能量注入！', '🎯 精准打击！', '🌈 彩虹桥开启！',
+                '💫 喵~ 走你！', '🌟 星光导航！'
+            ];
+            window.getFunnyMessage = function() {
+                return funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+            };
+
+            var randomBtn = document.getElementById('randomBtn');
+            if (randomBtn) {
+                randomBtn.addEventListener('click', function() {
+                    playMeow();
+                });
+            }
+        })();
+
+        // ================================================================
+        //  3. 数据 (120张卡片) —— 保持不变
+        // ================================================================
+        var originalIntents = [
+            { id: 1, title: "开发者选项 (Settings$DevelopmentSettingsActivity)", desc: "直接调用开发者选项Activity",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DevelopmentSettingsActivity;end",
+                cat: "developer", type: "可跳转", status: "available" },
+            { id: 2, title: "开发者选项 (Settings$DevelopmentSettingsDashboardActivity)",
+                desc: "新版开发者选项Dashboard",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DevelopmentSettingsDashboardActivity;end",
+                cat: "developer", type: "部分系统可跳转", status: "partial" },
+            { id: 3, title: "开发者选项 (DevelopmentSettings)", desc: "旧版开发者设置",
+                path: "intent:#Intent;component=com.android.settings/.DevelopmentSettings;end", cat: "developer",
+                type: "疑似不可跳转", status: "unavailable" },
+            { id: 4, title: "开发者选项 (系统标准动作)", desc: "使用APPLICATION_DEVELOPMENT_SETTINGS动作",
+                path: "intent:#Intent;action=android.settings.APPLICATION_DEVELOPMENT_SETTINGS;end",
+                cat: "developer", type: "可跳转", status: "available" },
+            { id: 5, title: "开发者选项 (加载设置片段)", desc: "在SubSettings中加载DevelopmentSettingsDashboardFragment",
+                path: "intent:#Intent;component=com.android.settings/.SubSettings;S.%3Asettings%3Ashow_fragment=com.android.settings.development.DevelopmentSettingsDashboardFragment;end",
+                cat: "developer", type: "部分系统可跳转", status: "partial" },
+            { id: 6, title: "开发者选项 (Activity+Fragment)", desc: "通过SettingsActivity加载开发者选项Fragment",
+                path: "intent:#Intent;action=android.intent.action.MAIN;launchFlags=0x10810000;component=com.android.settings/.SettingsActivity;S.%3Asettings%3Ashow_fragment=com.android.settings.development.DevelopmentSettingsDashboardFragment;end",
+                cat: "developer", type: "部分系统可跳转", status: "partial" },
+            { id: 7, title: "关于设备 (DeviceInfoSettingsActivity)", desc: "设备信息设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DeviceInfoSettingsActivity;end",
+                cat: "about", type: "可跳转", status: "available" },
+            { id: 8, title: "关于设备 (MyDeviceInfoActivity)", desc: "我的设备信息",
+                path: "intent:#Intent;component=com.android.settings/.Settings$MyDeviceInfoActivity;end", cat: "about",
+                type: "可跳转", status: "available" },
+            { id: 9, title: "无障碍设置 (AccessibilitySettingsActivity)", desc: "无障碍设置页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$AccessibilitySettingsActivity;end",
+                cat: "accessibility", type: "可跳转", status: "available" },
+            { id: 10, title: "安全设置 (SecurityDashboardActivity)", desc: "安全设置Dashboard",
+                path: "intent:#Intent;component=com.android.settings/.Settings$SecurityDashboardActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 11, title: "VPN设置 (VpnSettingsActivity)", desc: "VPN设置页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$VpnSettingsActivity;end", cat: "vpn",
+                type: "可跳转", status: "available" },
+            { id: 12, title: "APN设置 (ApnSettingsActivity)", desc: "APN设置页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$ApnSettingsActivity;end", cat: "apn",
+                type: "可跳转", status: "available" },
+            { id: 13, title: "受信任凭据 (TrustedCredentialsSettingsActivity)", desc: "证书管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$TrustedCredentialsSettingsActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 14, title: "设置搜索栏 (SearchActivity)", desc: "Android设置智能搜索",
+                path: "intent:#Intent;component=com.android.settings.intelligence/com.android.settings.intelligence.search.SearchActivity;end",
+                cat: "search", type: "可跳转", status: "available" },
+            { id: 15, title: "设备管理 (DeviceAdminSettingsActivity)", desc: "设备管理员设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DeviceAdminSettingsActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 16, title: "设备管理 (DeviceAdminSettings)", desc: "设备管理员设置类",
+                path: "intent:#Intent;component=com.android.settings/.DeviceAdminSettings;end", cat: "security",
+                type: "可跳转", status: "available" },
+            { id: 17, title: "设备管理 (DeviceAdminAdd)", desc: "设备管理员添加页面",
+                path: "intent:#Intent;component=com.android.settings/.applications.specialaccess.deviceadmin.DeviceAdminAdd;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 18, title: "设备管理 (EnterprisePrivacySettingsActivity)", desc: "企业隐私设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$EnterprisePrivacySettingsActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 19, title: "系统设置 (SystemDashboardActivity)", desc: "系统设置Dashboard",
+                path: "intent:#Intent;component=com.android.settings/.Settings$SystemDashboardActivity;end",
+                cat: "system", type: "可跳转", status: "available" },
+            { id: 20, title: "设置建议 (SearchActivity)", desc: "设置建议页面",
+                path: "intent:#Intent;component=com.android.settings.intelligence/com.android.settings.intelligence.search.SearchActivity;end",
+                cat: "search", type: "可跳转", status: "available" },
+            { id: 21, title: "原生设置界面 (SettingsHomepageActivity)", desc: "Android设置主页",
+                path: "intent:#Intent;component=com.android.settings/.homepage.SettingsHomepageActivity;end",
+                cat: "system", type: "可跳转", status: "available" },
+            { id: 22, title: "蓝牙设置 (BluetoothSettingsActivity)", desc: "蓝牙设置主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$BluetoothSettingsActivity;end",
+                cat: "bluetooth", type: "可跳转", status: "available" },
+            { id: 23, title: "蓝牙设置 (系统标准动作)", desc: "使用BLUETOOTH_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.BLUETOOTH_SETTINGS;end", cat: "bluetooth", type: "可跳转",
+                status: "available" },
+            { id: 24, title: "WiFi设置 (WifiSettingsActivity)", desc: "WiFi设置主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$WifiSettingsActivity;end", cat: "wifi",
+                type: "可跳转", status: "available" },
+            { id: 25, title: "WiFi设置 (系统标准动作)", desc: "使用WIFI_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.WIFI_SETTINGS;end", cat: "wifi", type: "可跳转",
+                status: "available" },
+            { id: 26, title: "WiFi详情 (WifiInfoActivity)", desc: "当前连接WiFi详情",
+                path: "intent:#Intent;component=com.android.settings/.wifi.WifiInfoActivity;end", cat: "wifi",
+                type: "可跳转", status: "available" },
+            { id: 27, title: "电池设置 (BatterySaverSettingsActivity)", desc: "省电模式设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$BatterySaverSettingsActivity;end",
+                cat: "battery", type: "可跳转", status: "available" },
+            { id: 28, title: "电池设置 (BatterySettingsActivity)", desc: "电池使用情况统计",
+                path: "intent:#Intent;component=com.android.settings/.Settings$BatterySettingsActivity;end",
+                cat: "battery", type: "可跳转", status: "available" },
+            { id: 29, title: "电池设置 (系统标准动作)", desc: "使用BATTERY_SAVER_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.BATTERY_SAVER_SETTINGS;end", cat: "battery",
+                type: "可跳转", status: "available" },
+            { id: 30, title: "应用管理 (ManageApplicationsActivity)", desc: "所有应用管理页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$ManageApplicationsActivity;end",
+                cat: "app", type: "可跳转", status: "available" },
+            { id: 31, title: "应用信息 (AppInfoSettings)", desc: "指定应用信息页面（需传包名参数）",
+                path: "intent:#Intent;component=com.android.settings/.applications.appinfo.AppInfoSettings;end",
+                cat: "app", type: "可跳转", status: "available" },
+            { id: 32, title: "应用权限 (ApplicationPermissionsActivity)", desc: "应用权限管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$ApplicationPermissionsActivity;end",
+                cat: "app", type: "可跳转", status: "available" },
+            { id: 33, title: "显示设置 (DisplaySettingsActivity)", desc: "显示设置主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DisplaySettingsActivity;end",
+                cat: "display", type: "可跳转", status: "available" },
+            { id: 34, title: "字体设置 (FontSettingsActivity)", desc: "系统字体大小/样式设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$FontSettingsActivity;end",
+                cat: "display", type: "可跳转", status: "available" },
+            { id: 35, title: "亮度设置 (BrightnessSettings)", desc: "屏幕亮度调节",
+                path: "intent:#Intent;component=com.android.settings/.display.BrightnessSettings;end", cat: "display",
+                type: "可跳转", status: "available" },
+            { id: 36, title: "声音设置 (SoundSettingsActivity)", desc: "声音设置主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$SoundSettingsActivity;end",
+                cat: "sound", type: "可跳转", status: "available" },
+            { id: 37, title: "声音设置 (系统标准动作)", desc: "使用SOUND_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.SOUND_SETTINGS;end", cat: "sound", type: "可跳转",
+                status: "available" },
+            { id: 38, title: "存储设置 (StorageSettingsActivity)", desc: "存储管理主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$StorageSettingsActivity;end",
+                cat: "storage", type: "可跳转", status: "available" },
+            { id: 39, title: "存储设置 (系统标准动作)", desc: "使用INTERNAL_STORAGE_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.INTERNAL_STORAGE_SETTINGS;end", cat: "storage",
+                type: "可跳转", status: "available" },
+            { id: 40, title: "定位设置 (LocationSettingsActivity)", desc: "位置信息设置主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$LocationSettingsActivity;end",
+                cat: "location", type: "可跳转", status: "available" },
+            { id: 41, title: "定位设置 (系统标准动作)", desc: "使用LOCATION_SOURCE_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end", cat: "location",
+                type: "可跳转", status: "available" },
+            { id: 42, title: "通知设置 (NotificationSettingsActivity)", desc: "应用通知管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$NotificationSettingsActivity;end",
+                cat: "notification", type: "可跳转", status: "available" },
+            { id: 43, title: "通知设置 (系统标准动作)", desc: "使用NOTIFICATION_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.NOTIFICATION_SETTINGS;end", cat: "notification",
+                type: "可跳转", status: "available" },
+            { id: 44, title: "个人热点 (TetherSettings)", desc: "移动网络共享/热点设置",
+                path: "intent:#Intent;component=com.android.settings/.TetherSettings;end", cat: "hotspot",
+                type: "可跳转", status: "available" },
+            { id: 45, title: "个人热点 (系统标准动作)", desc: "使用TETHER_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.TETHER_SETTINGS;end", cat: "hotspot", type: "可跳转",
+                status: "available" },
+            { id: 46, title: "账户设置 (AccountSettingsActivity)", desc: "账户与同步设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$AccountSettingsActivity;end",
+                cat: "account", type: "可跳转", status: "available" },
+            { id: 47, title: "账户设置 (系统标准动作)", desc: "使用ADD_ACCOUNT_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.ADD_ACCOUNT_SETTINGS;end", cat: "account",
+                type: "可跳转", status: "available" },
+            { id: 48, title: "语言设置 (LanguageSettingsActivity)", desc: "系统语言设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$LanguageSettingsActivity;end",
+                cat: "language", type: "可跳转", status: "available" },
+            { id: 49, title: "语言设置 (系统标准动作)", desc: "使用LOCALE_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.LOCALE_SETTINGS;end", cat: "language", type: "可跳转",
+                status: "available" },
+            { id: 50, title: "日期时间设置 (DateTimeSettingsActivity)", desc: "日期和时间设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DateTimeSettingsActivity;end",
+                cat: "system", type: "可跳转", status: "available" },
+            { id: 51, title: "移动网络设置 (NetworkDashboardActivity)", desc: "移动网络与SIM卡管理主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$NetworkDashboardActivity;end",
+                cat: "apn", type: "可跳转", status: "available" },
+            { id: 52, title: "双卡管理 (MultiSimSettingsActivity)", desc: "双卡与SIM卡信息管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$MultiSimSettingsActivity;end",
+                cat: "apn", type: "可跳转", status: "available" },
+            { id: 53, title: "流量使用情况 (DataUsageSummaryActivity)", desc: "流量统计与管理页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DataUsageSummaryActivity;end",
+                cat: "apn", type: "可跳转", status: "available" },
+            { id: 54, title: "数据漫游设置 (系统标准动作)", desc: "使用DATA_ROAMING_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.DATA_ROAMING_SETTINGS;end", cat: "apn", type: "可跳转",
+                status: "available" },
+            { id: 55, title: "运营商网络设置 (系统标准动作)", desc: "使用NETWORK_OPERATOR_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.NETWORK_OPERATOR_SETTINGS;end", cat: "apn",
+                type: "可跳转", status: "available" },
+            { id: 56, title: "WiFi高级设置 (WifiAdvancedSettingsActivity)", desc: "WiFi高级选项与IP设置",
+                path: "intent:#Intent;component=com.android.settings/.wifi.WifiAdvancedSettings;end", cat: "wifi",
+                type: "可跳转", status: "available" },
+            { id: 57, title: "已保存WiFi网络 (SavedWifiSettingsActivity)", desc: "已保存WiFi密码管理",
+                path: "intent:#Intent;component=com.android.settings/.wifi.SavedWifiSettings;end", cat: "wifi",
+                type: "可跳转", status: "available" },
+            { id: 58, title: "WiFi直连设置 (WifiP2pSettingsActivity)", desc: "WiFi直连与设备配对",
+                path: "intent:#Intent;component=com.android.settings/.wifi.WifiP2pSettings;end", cat: "wifi",
+                type: "可跳转", status: "available" },
+            { id: 59, title: "蓝牙配对设备列表 (BluetoothPairingActivity)", desc: "已配对与可用蓝牙设备管理",
+                path: "intent:#Intent;component=com.android.settings/.bluetooth.BluetoothPairingActivity;end",
+                cat: "bluetooth", type: "可跳转", status: "available" },
+            { id: 60, title: "蓝牙高级设置 (BluetoothAdvancedSettingsActivity)", desc: "蓝牙音频、编码与高级选项",
+                path: "intent:#Intent;component=com.android.settings/.bluetooth.BluetoothAdvancedSettings;end",
+                cat: "bluetooth", type: "可跳转", status: "available" },
+            { id: 61, title: "热点高级设置 (WifiHotspotSettingsActivity)", desc: "热点名称、密码与频段设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$WifiHotspotSettingsActivity;end",
+                cat: "hotspot", type: "可跳转", status: "available" },
+            { id: 62, title: "USB共享网络 (UsbTetherSettingsActivity)", desc: "USB网络共享开关与设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$UsbTetherSettingsActivity;end",
+                cat: "hotspot", type: "可跳转", status: "available" },
+            { id: 63, title: "蓝牙网络共享 (BluetoothTetherSettingsActivity)", desc: "蓝牙网络共享设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$BluetoothTetherSettingsActivity;end",
+                cat: "hotspot", type: "可跳转", status: "available" },
+            { id: 64, title: "NFC设置 (系统标准动作)", desc: "使用NFC_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.NFC_SETTINGS;end", cat: "system", type: "可跳转",
+                status: "available" },
+            { id: 65, title: "连接与共享 (ConnectedDeviceDashboardActivity)", desc: "连接与共享设置主页面",
+                path: "intent:#Intent;component=com.android.settings/.Settings$ConnectedDeviceDashboardActivity;end",
+                cat: "system", type: "可跳转", status: "available" },
+            { id: 66, title: "投屏设置 (系统标准动作)", desc: "使用CAST_SETTINGS系统动作",
+                path: "intent:#Intent;action=android.settings.CAST_SETTINGS;end", cat: "display", type: "可跳转",
+                status: "available" },
+            { id: 67, title: "屏幕刷新率设置 (RefreshRateSettingsActivity)", desc: "屏幕刷新率与帧率调节",
+                path: "intent:#Intent;component=com.android.settings/.display.RefreshRateSettings;end",
+                cat: "display", type: "可跳转", status: "available" },
+            { id: 68, title: "护眼模式设置 (NightDisplaySettingsActivity)", desc: "夜间模式/护眼模式设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$NightDisplaySettingsActivity;end",
+                cat: "display", type: "可跳转", status: "available" },
+            { id: 69, title: "息屏显示设置 (AmbientDisplaySettingsActivity)", desc: "息屏显示/Always On设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$AmbientDisplaySettingsActivity;end",
+                cat: "display", type: "可跳转", status: "available" },
+            { id: 70, title: "字体与显示大小 (FontSizeActivity)", desc: "系统字体大小与显示尺寸调节",
+                path: "intent:#Intent;component=com.android.settings/.Settings$FontSizeActivity;end", cat: "display",
+                type: "可跳转", status: "available" },
+            { id: 71, title: "自动旋转设置 (RotationSettingsActivity)", desc: "屏幕自动旋转与方向锁定",
+                path: "intent:#Intent;component=com.android.settings/.display.RotationSettings;end", cat: "display",
+                type: "可跳转", status: "available" },
+            { id: 72, title: "勿扰模式设置 (ZenModeSettingsActivity)", desc: "免打扰模式设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$ZenModeSettingsActivity;end",
+                cat: "sound", type: "可跳转", status: "available" },
+            { id: 73, title: "铃声设置 (RingtoneSettingsActivity)", desc: "来电铃声与通知铃声设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$RingtoneSettingsActivity;end",
+                cat: "sound", type: "可跳转", status: "available" },
+            { id: 74, title: "震动强度设置 (VibrationSettingsActivity)", desc: "系统震动强度与模式调节",
+                path: "intent:#Intent;component=com.android.settings/.sound.VibrationSettings;end", cat: "sound",
+                type: "可跳转", status: "available" },
+            { id: 75, title: "闹钟铃声设置 (AlarmRingtoneSettingsActivity)", desc: "闹钟铃声与震动设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$AlarmRingtoneSettingsActivity;end",
+                cat: "sound", type: "可跳转", status: "available" },
+            { id: 76, title: "默认应用设置 (DefaultAppSettingsActivity)", desc: "系统默认应用管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$DefaultAppSettingsActivity;end",
+                cat: "app", type: "可跳转", status: "available" },
+            { id: 77, title: "应用特殊访问权限 (SpecialAccessSettingsActivity)", desc: "应用特殊权限与高级权限管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$SpecialAccessSettingsActivity;end",
+                cat: "app", type: "可跳转", status: "available" },
+            { id: 78, title: "安装来源管理 (ManageUnknownAppSourcesActivity)", desc: "未知应用安装权限管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$ManageUnknownAppSourcesActivity;end",
+                cat: "app", type: "可跳转", status: "available" },
+            { id: 79, title: "自启动管理 (AutoStartManageActivity)", desc: "应用自启动权限管理",
+                path: "intent:#Intent;component=com.android.settings/.app.autostart.AutoStartManageActivity;end",
+                cat: "app", type: "可跳转", status: "available" },
+            { id: 80, title: "后台应用管理 (BackgroundAppsActivity)", desc: "后台应用活动与限制管理",
+                path: "intent:#Intent;component=com.android.settings/.app.BackgroundApps;end", cat: "app",
+                type: "可跳转", status: "available" },
+            { id: 81, title: "电池优化设置 (BatteryOptimizationSettingsActivity)", desc: "应用电池优化白名单管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$BatteryOptimizationSettingsActivity;end",
+                cat: "battery", type: "可跳转", status: "available" },
+            { id: 82, title: "耗电详情统计 (PowerUsageSummaryActivity)", desc: "应用与系统耗电详情",
+                path: "intent:#Intent;component=com.android.settings/.Settings$PowerUsageSummaryActivity;end",
+                cat: "battery", type: "可跳转", status: "available" },
+            { id: 83, title: "极限省电模式 (UltraPowerSaverActivity)", desc: "极限省电/超级省电模式设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$UltraPowerSaverActivity;end",
+                cat: "battery", type: "可跳转", status: "available" },
+            { id: 84, title: "电池健康状态 (BatteryHealthActivity)", desc: "电池健康度与循环次数查看",
+                path: "intent:#Intent;component=com.android.settings/.battery.BatteryHealth;end", cat: "battery",
+                type: "可跳转", status: "available" },
+            { id: 85, title: "存储清理页面 (StorageManagerActivity)", desc: "系统存储清理与文件管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$StorageManagerActivity;end",
+                cat: "storage", type: "可跳转", status: "available" },
+            { id: 86, title: "SD卡设置 (MemoryCardSettingsActivity)", desc: "SD卡与外置存储管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$MemoryCardSettingsActivity;end",
+                cat: "storage", type: "可跳转", status: "available" },
+            { id: 87, title: "位置高级设置 (LocationAdvancedSettingsActivity)", desc: "定位精度、历史与高级选项",
+                path: "intent:#Intent;component=com.android.settings/.location.LocationAdvancedSettings;end",
+                cat: "location", type: "可跳转", status: "available" },
+            { id: 88, title: "位置权限管理 (LocationPermissionActivity)", desc: "应用位置权限管理",
+                path: "intent:#Intent;component=com.android.settings/.location.LocationPermission;end",
+                cat: "location", type: "可跳转", status: "available" },
+            { id: 89, title: "紧急呼叫设置 (EmergencyInfoSettingsActivity)", desc: "紧急联系人与急救信息设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$EmergencyInfoSettingsActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 90, title: "屏幕锁定设置 (LockScreenSettingsActivity)", desc: "锁屏密码与解锁方式设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$LockScreenSettingsActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 91, title: "智能解锁设置 (SmartLockSettingsActivity)", desc: "智能解锁与信任设备设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$SmartLockSettingsActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 92, title: "隐私设置 (PrivacyDashboardActivity)", desc: "系统隐私与权限使用记录",
+                path: "intent:#Intent;component=com.android.settings/.Settings$PrivacyDashboardActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 93, title: "权限管理页面 (PermissionControllerActivity)", desc: "系统权限总览与管理",
+                path: "intent:#Intent;component=com.android.permissioncontroller/com.android.permissioncontroller.permission.ui.PermissionControllerActivity;end",
+                cat: "security", type: "可跳转", status: "available" },
+            { id: 94, title: "通知使用权管理 (NotificationAccessSettingsActivity)", desc: "通知读取权限管理",
+                path: "intent:#Intent;component=com.android.settings/.Settings$NotificationAccessSettingsActivity;end",
+                cat: "notification", type: "可跳转", status: "available" },
+            { id: 95, title: "状态栏通知设置 (StatusBarNotificationSettingsActivity)", desc: "状态栏图标与通知显示设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$StatusBarNotificationSettingsActivity;end",
+                cat: "notification", type: "部分系统可跳转", status: "partial" },
+            { id: 96, title: "输入法与键盘设置 (InputMethodAndLanguageSettingsActivity)", desc: "默认输入法与键盘设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$InputMethodAndLanguageSettingsActivity;end",
+                cat: "language", type: "部分系统可跳转", status: "partial" },
+            { id: 97, title: "语音输入设置 (VoiceInputSettingsActivity)", desc: "语音识别与语音输入设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$VoiceInputSettingsActivity;end",
+                cat: "language", type: "部分系统可跳转", status: "partial" },
+            { id: 98, title: "系统更新页面 (SystemUpdateActivity)", desc: "系统版本更新与升级",
+                path: "intent:#Intent;component=com.android.settings/.Settings$SystemUpdateActivity;end",
+                cat: "system", type: "部分系统可跳转", status: "partial" },
+            { id: 99, title: "备份与恢复 (BackupSettingsActivity)", desc: "系统备份与恢复设置",
+                path: "intent:#Intent;component=com.android.settings/.Settings$BackupSettingsActivity;end",
+                cat: "system", type: "部分系统可跳转", status: "partial" },
+            { id: 100, title: "系统重置选项 (ResetDashboardActivity)", desc: "恢复出厂设置与重置选项",
+                path: "intent:#Intent;component=com.android.settings/.Settings$ResetDashboardActivity;end",
+                cat: "system", type: "部分系统可跳转", status: "partial" }
+        ];
+
+        var extraDeveloper = [
+            { id: 101, title: "开发者选项 (AdbSettings)", desc: "直接打开USB调试设置",
+                path: "intent:#Intent;component=com.android.settings/.development.AdbSettings;end", cat: "developer",
+                type: "可用", status: "available" },
+            { id: 102, title: "开发者选项 (无线调试)", desc: "无线调试界面 (Android 11+)",
+                path: "intent:#Intent;component=com.android.settings/.development.AdbWirelessSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 103, title: "开发者选项 (选择模拟应用)", desc: "模拟应用/位置欺骗",
+                path: "intent:#Intent;component=com.android.settings/.development.AppPicker;end", cat: "developer",
+                type: "可用", status: "available" },
+            { id: 104, title: "开发者选项 (后台进程限制)", desc: "设置后台进程限制",
+                path: "intent:#Intent;component=com.android.settings/.development.BackgroundProcessLimitPreference;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 105, title: "开发者选项 (显示刷新率)", desc: "屏幕刷新率显示叠加层",
+                path: "intent:#Intent;component=com.android.settings/.development.OverlaySettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 106, title: "开发者选项 (GPU呈现模式)", desc: "GPU渲染分析",
+                path: "intent:#Intent;component=com.android.settings/.development.gpu.GpuSettings;end",
+                cat: "developer", type: "部分可用", status: "partial" },
+            { id: 107, title: "开发者选项 (动画缩放)", desc: "窗口动画、过渡动画缩放",
+                path: "intent:#Intent;component=com.android.settings/.development.AnimationScaleSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 108, title: "开发者选项 (调试应用程序)", desc: "选择调试应用",
+                path: "intent:#Intent;component=com.android.settings/.development.DebugAppSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 109, title: "开发者选项 (等待调试器)", desc: "调试应用时等待调试器",
+                path: "intent:#Intent;component=com.android.settings/.development.WaitForDebuggerSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 110, title: "开发者选项 (验证应用)", desc: "通过USB验证应用",
+                path: "intent:#Intent;component=com.android.settings/.development.VerifyAppsOverUsbSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 111, title: "开发者选项 (显示触摸)", desc: "显示触摸点/指针位置",
+                path: "intent:#Intent;component=com.android.settings/.development.ShowTouchesSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 112, title: "开发者选项 (保持唤醒)", desc: "充电时屏幕常亮",
+                path: "intent:#Intent;component=com.android.settings/.development.StayAwakeSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 113, title: "开发者选项 (蓝牙数据包日志)", desc: "捕获蓝牙HCI日志",
+                path: "intent:#Intent;component=com.android.settings/.development.BluetoothLogSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 114, title: "开发者选项 (OEM解锁)", desc: "OEM解锁开关",
+                path: "intent:#Intent;component=com.android.settings/.development.OemUnlockSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 115, title: "开发者选项 (运行服务)", desc: "显示正在运行的服务",
+                path: "intent:#Intent;component=com.android.settings/.development.RunningServicesSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 116, title: "开发者选项 (快捷开发者选项)", desc: "通过快捷设置进入开发者",
+                path: "intent:#Intent;component=com.android.systemui/.qs.tiles.DevelopmentTile;end", cat: "developer",
+                type: "需系统UI", status: "partial" },
+            { id: 117, title: "开发者选项 (显示布局边界)", desc: "布局边界显示",
+                path: "intent:#Intent;component=com.android.settings/.development.ShowLayoutBoundsSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 118, title: "开发者选项 (模拟辅助显示)", desc: "模拟第二屏幕",
+                path: "intent:#Intent;component=com.android.settings/.development.OverlayDisplaySettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 119, title: "开发者选项 (颜色模式)", desc: "模拟颜色空间",
+                path: "intent:#Intent;component=com.android.settings/.development.ColorModeSettings;end",
+                cat: "developer", type: "可用", status: "available" },
+            { id: 120, title: "开发者选项 (快捷选择)", desc: "选择要开发的应用",
+                path: "intent:#Intent;component=com.android.settings/.development.QuickDevelopmentAppSettings;end",
+                cat: "developer", type: "可用", status: "available" }
+        ];
+
+        var allIntentsBase = originalIntents.concat(extraDeveloper);
+
+        // ================================================================
+        //  4. 状态
+        // ================================================================
+        var state = {
+            attempts: 0,
+            successes: 0,
+            filter: 'all',
+            customIntents: [],
+            searchKeyword: ''
+        };
+
+        var catNames = {
+            developer: '开发者',
+            about: '关于',
+            accessibility: '无障碍',
+            security: '安全',
+            vpn: 'VPN',
+            apn: 'APN',
+            bluetooth: '蓝牙',
+            wifi: 'WiFi',
+            battery: '电池',
+            app: '应用',
+            display: '显示',
+            sound: '声音',
+            storage: '存储',
+            location: '定位',
+            notification: '通知',
+            hotspot: '热点',
+            account: '账户',
+            language: '语言',
+            system: '系统',
+            search: '搜索',
+            custom: '自定义'
+        };
+
+        // ================================================================
+        //  5. DOM 引用
+        // ================================================================
+        var container = document.getElementById('cards-container');
+        var toastEl = document.getElementById('toast');
+        var searchInput = document.getElementById('searchInput');
+        var clearBtn = document.getElementById('clearSearchBtn');
+
+        // ================================================================
+        //  6. 工具函数
+        // ================================================================
+        function showToast(msg) {
+            toastEl.textContent = msg;
+            toastEl.classList.add('show');
+            clearTimeout(toastEl._timer);
+            toastEl._timer = setTimeout(function() { toastEl.classList.remove('show'); }, 2000);
+        }
+        window.showToast = showToast;
+
+        function updateStats() {
+            document.getElementById('total-count').textContent = allIntentsBase.length + state.customIntents.length;
+            document.getElementById('custom-count').textContent = state.customIntents.length;
+            document.getElementById('attempt-count').textContent = state.attempts;
+            document.getElementById('success-count').textContent = state.successes;
+            document.getElementById('total-attempts').textContent = state.attempts;
+
+            if (state.attempts > 0 && state.attempts % 10 === 0) {
+                var msgs = ['🎉 你已经尝试了 ' + state.attempts + ' 次，真喵的棒！', '🐱 坚持不懈！', '✨ 即将成为跳转大师！'];
+                showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+                try { window.playMeow && window.playMeow(); } catch (_) {}
+            }
+        }
+
+        // ================================================================
+        //  本程序为Catiflytek版权所有，未经授权不得转转
+        // ================================================================
+        function renderCards() {
+            var customList = [];
+            try { customList = JSON.parse(localStorage.getItem('customIntentsBeta') || '[]'); } catch (_) {}
+            state.customIntents = customList;
+
+            var customWithId = customList.map(function(c, i) {
+                return { id: 2000 + i, cat: 'custom', type: '自定义', status: 'available', title: c.title || '未命名',
+                    desc: c.desc || '自定义Intent', path: c.path || '' };
+            });
+
+            var allIntents = allIntentsBase.concat(customWithId);
+
+            var filtered = allIntents;
+            if (state.filter !== 'all') {
+                filtered = filtered.filter(function(i) { return i.cat === state.filter; });
+            }
+            if (state.searchKeyword.trim()) {
+                var kw = state.searchKeyword.trim().toLowerCase();
+                filtered = filtered.filter(function(i) {
+                    return (i.title || '').toLowerCase().includes(kw) ||
+                        (i.desc || '').toLowerCase().includes(kw) ||
+                        (i.path || '').toLowerCase().includes(kw);
+                });
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:48px; color:var(--text-secondary);">🔍 没有找到卡片</div>';
+                updateStats();
+                return;
+            }
+
+            var fragment = document.createDocumentFragment();
+
+            filtered.forEach(function(item) {
+                var escapedPath = encodeURIComponent(item.path);
+                var catLabel = catNames[item.cat] || '其他';
+                var statusClass = item.status || 'available';
+                var typeLabel = item.type || '未知';
+
+                var card = document.createElement('div');
+                card.className = 'neo-card';
+                card.dataset.id = item.id;
+
+                card.innerHTML =
+                    '<div class="card-row">' +
+                    '<span class="card-cat">' + catLabel + '</span>' +
+                    '<span class="card-status ' + statusClass + '">' + typeLabel + '</span>' +
+                    '</div>' +
+                    '<div class="card-title">' + (item.title || '') + '</div>' +
+                    '<div class="card-desc">' + (item.desc || '') + '</div>' +
+                    '<div class="intent-block">' + (item.path || '') + '</div>' +
+                    '<div class="action-group">' +
+                    '<button class="btn-minimal primary" data-path="' + escapedPath + '" data-id="' + item.id +
+                    '">跳转</button>' +
+                    '<button class="btn-minimal secondary" data-path="' + escapedPath + '">复制</button>' +
+                    (item.cat === 'custom' ? '<button class="btn-minimal delete" data-id="' + item.id +
+                        '">删除</button>' : '') +
+                    '</div>';
+
+                fragment.appendChild(card);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(fragment);
+            updateStats();
+        }
+
+        container.addEventListener('click', function(e) {
+            var target = e.target.closest('button');
+            if (!target) return;
+
+            if (target.classList.contains('primary') && target.dataset.path) {
+                var pathEncoded = target.dataset.path;
+                var id = target.dataset.id;
+                state.attempts++;
+                var msg = window.getFunnyMessage ? window.getFunnyMessage() : '🚀 跳转中...';
+                showToast(msg + ' (ID:' + id + ')');
+                try {
+                    window.location.href = decodeURIComponent(pathEncoded);
+                } catch (_) {
+                    showToast('❌ 跳转失败，喵~');
+                }
+                updateStats();
+                try { window.playMeow && window.playMeow(); } catch (_) {}
+                return;
+            }
+
+            if (target.classList.contains('secondary') && target.dataset.path) {
+                var pEnc = target.dataset.path;
+                var decoded = decodeURIComponent(pEnc);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(decoded).then(function() {
+                        showToast('📋 已复制喵~');
+                    }).catch(function() {
+                        fallbackCopy(decoded);
+                    });
+                } else {
+                    fallbackCopy(decoded);
+                }
+                return;
+            }
+
+            if (target.classList.contains('delete') && target.dataset.id) {
+                var delId = parseInt(target.dataset.id, 10);
+                var idx = state.customIntents.findIndex(function(_, i) { return 2000 + i === delId; });
+                if (idx !== -1) {
+                    state.customIntents.splice(idx, 1);
+                    try { localStorage.setItem('customIntentsBeta', JSON.stringify(state.customIntents)); } catch (_) {}
+                    renderCards();
+                    showToast('🗑️ 已删除喵~');
+                }
+            }
+        });
+
+        function fallbackCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            ta.style.pointerEvents = 'none';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast('📋 已复制喵~');
+            } catch (_) {
+                showToast('❌ 复制失败，请手动复制');
+            }
+            document.body.removeChild(ta);
+        }
+
+        // ================================================================
+        //  8. 筛选器
+        // ================================================================
+        document.querySelectorAll('.filter-tag').forEach(function(btn) {
+            if (btn.id === 'randomBtn') return;
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tag').forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                state.filter = this.dataset.filter;
+                renderCards();
+            });
+        });
+
+        // ================================================================
+        //  9. 随机卡片
+        // ================================================================
+        document.getElementById('randomBtn').addEventListener('click', function() {
+            var cards = container.querySelectorAll('.neo-card');
+            if (cards.length === 0) { showToast('❌ 没有卡片可选喵'); return; }
+            cards.forEach(function(c) { c.classList.remove('random-highlight'); });
+            var idx = Math.floor(Math.random() * cards.length);
+            var target = cards[idx];
+            target.classList.add('random-highlight');
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(function() { target.classList.remove('random-highlight'); }, 3000);
+            showToast('✨ 选中第 ' + (idx + 1) + ' 个卡片，喵~');
+            try { window.playMeow && window.playMeow(); } catch (_) {}
+            if (Math.random() < 0.1) {
+                try { window.catRain && window.catRain(); } catch (_) {}
+            }
+        });
+
+        // ================================================================
+        //  10. 主题切换
+        // ================================================================
+        var themeBtn = document.getElementById('theme-btn');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeBtn.textContent = '☀️';
+        }
+        themeBtn.addEventListener('click', function() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeBtn.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeBtn.textContent = '☀️';
+            }
+        });
+
+        // ================================================================
+        //  11. 个性化设置
+        // ================================================================
+        var root = document.documentElement;
+        var savedHue = localStorage.getItem('userHue') || 225;
+        var savedScale = localStorage.getItem('userScale') || 1.0;
+
+        root.style.setProperty('--user-accent-h', savedHue);
+        root.style.setProperty('--user-card-scale', savedScale);
+        root.style.setProperty('--user-spacing', savedScale);
+
+        var hueSlider = document.getElementById('hueSlider');
+        var scaleSlider = document.getElementById('scaleSlider');
+        var hueValue = document.getElementById('hueValue');
+        var scaleValue = document.getElementById('scaleValue');
+
+        hueSlider.value = savedHue;
+        hueValue.innerText = savedHue + '°';
+        scaleSlider.value = savedScale;
+        scaleValue.innerText = parseFloat(savedScale).toFixed(2) + 'x';
+
+        hueSlider.addEventListener('input', function(e) {
+            var v = e.target.value;
+            root.style.setProperty('--user-accent-h', v);
+            hueValue.innerText = v + '°';
+            localStorage.setItem('userHue', v);
+        });
+
+        scaleSlider.addEventListener('input', function(e) {
+            var v = parseFloat(e.target.value);
+            root.style.setProperty('--user-card-scale', v);
+            root.style.setProperty('--user-spacing', v);
+            scaleValue.innerText = v.toFixed(2) + 'x';
+            localStorage.setItem('userScale', v);
+        });
+
+        document.getElementById('resetSettings').addEventListener('click', function() {
+            localStorage.removeItem('userHue');
+            localStorage.removeItem('userScale');
+            location.reload();
+        });
+
+        // ================================================================
+        //  12. 设置抽屉
+        // ================================================================
+        var settingsBtn = document.getElementById('settings-btn');
+        var settingsDrawer = document.getElementById('settings-drawer');
+
+        settingsBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            settingsDrawer.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!settingsDrawer.contains(e.target) && e.target.id !== 'settings-btn') {
+                settingsDrawer.classList.remove('show');
+            }
+        });
+
+        // ================================================================
+        //  13. 帮助折叠
+        // ================================================================
+        document.getElementById('helpHeader').addEventListener('click', function() {
+            var content = document.getElementById('helpContent');
+            var toggle = document.getElementById('helpToggle');
+            content.classList.toggle('show');
+            toggle.textContent = content.classList.contains('show') ? '✖' : '➕';
+        });
+
+        // ================================================================
+        //  14. 二维码
+        // ================================================================
+        var qrPopup = document.getElementById('qrPopup');
+        var popupOverlay = document.getElementById('popupOverlay');
+
+        document.getElementById('showQrBtn').addEventListener('click', function() {
+            qrPopup.classList.add('show');
+            popupOverlay.classList.add('show');
+        });
+
+        popupOverlay.addEventListener('click', function() {
+            qrPopup.classList.remove('show');
+            popupOverlay.classList.remove('show');
+        });
+
+        // ================================================================
+        //  15. 自定义Intent
+        // ================================================================
+        var pkgInput = document.getElementById('customPkg');
+        var clsInput = document.getElementById('customCls');
+        var previewSpan = document.getElementById('previewIntent');
+
+        function updatePreview() {
+            var pkg = pkgInput.value.trim() || 'com.android.settings';
+            var cls = clsInput.value.trim() || '.Settings$DevelopmentSettingsActivity';
+            if (cls && !cls.startsWith('.')) cls = '.' + cls;
+            previewSpan.innerText = pkg + cls;
+        }
+
+        pkgInput.addEventListener('input', updatePreview);
+        clsInput.addEventListener('input', updatePreview);
+
+        document.getElementById('addCustomBtn').addEventListener('click', function() {
+            var pkg = pkgInput.value.trim();
+            var cls = clsInput.value.trim();
+            var desc = document.getElementById('customDesc').value.trim() || '自定义Intent';
+
+            if (!pkg || !cls) { showToast('❌ 包名和类名不能为空喵'); return; }
+            if (!cls.startsWith('.')) cls = '.' + cls;
+
+            var fullPath = 'intent:#Intent;component=' + pkg + cls + ';end';
+            var title = desc.length > 30 ? desc.substring(0, 27) + '…' : desc;
+
+            var existing = [];
+            try { existing = JSON.parse(localStorage.getItem('customIntentsBeta') || '[]'); } catch (_) {}
+            existing.push({ title: title, desc: '通过自定义命令生成', path: fullPath, cat: 'custom' });
+            localStorage.setItem('customIntentsBeta', JSON.stringify(existing));
+
+            renderCards();
+            showToast('✅ 自定义Intent已保存喵~');
+            try { window.playMeow && window.playMeow(); } catch (_) {}
+        });
+
+        // ================================================================
+        //  16. 搜索
+        // ================================================================
+        function handleSearch() {
+            state.searchKeyword = searchInput.value;
+            clearBtn.style.display = state.searchKeyword ? 'block' : 'none';
+            renderCards();
+        }
+
+        searchInput.addEventListener('input', handleSearch);
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            handleSearch();
+        });
+
+      
+        window.playMeow = function() {
+            try {
+                if (!window.audioCtx) window.audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                var ctx = window.audioCtx;
+                var osc = ctx.createOscillator();
+                var gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
+                osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.2);
+            } catch (_) {}
+        };
+
+        window.catRain = function() {
+            var emojis = ['🐱', '😺', '😸', '😻', '🙀', '🐈', '🐾'];
+            for (var i = 0; i < 12; i++) {
+                (function() {
+                    var el = document.createElement('div');
+                    el.className = 'cat-rain';
+                    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    el.style.left = (Math.random() * 90 + 5) + '%';
+                    el.style.fontSize = (2 + Math.random() * 3) + 'rem';
+                    el.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+                    el.style.animationDelay = (Math.random() * 0.6) + 's';
+                    document.body.appendChild(el);
+                    setTimeout(function() { el.remove(); }, 4000);
+                })();
+            }
+            try { window.playMeow(); } catch (_) {}
+        };
+
+        // ================================================================
+        //  18. 初始化（弹窗始终显示，不读取 localStorage）
+        // ================================================================
+        // 不再检查 localStorage，确保每次加载都显示欢迎弹窗
+        // 但为了兼容可能已隐藏的情况，强制移除 hide 类
+        var modal = document.getElementById('welcomeModal');
+        if (modal) modal.classList.remove('hide');
+
+        renderCards();
+        updatePreview();
+        showToast('✨ Catiflytek跳转小助手已加载，共' + allIntentsBase.length + '张卡片 喵~');
+    </script>
+</body>
+</html>
